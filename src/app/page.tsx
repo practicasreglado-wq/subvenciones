@@ -20,7 +20,16 @@ const defaultFilters: SearchFilters = {
   fechaDesde: "",
   fechaHasta: "",
   soloAbiertas: false,
+  presupuestoRango: "",
 };
+
+function todayES(): string {
+  return new Date().toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 export default function HomePage() {
   const [searchText, setSearchText] = useState("");
@@ -65,9 +74,12 @@ export default function HomePage() {
               <h1 className="mb-3 text-3xl font-bold text-white sm:text-4xl">
                 Encuentra tu subvención
               </h1>
-              <p className="mb-8 text-slate-400">
+              <p className="mb-1 text-slate-400">
                 Busca entre todas las convocatorias del gobierno de España.
                 Filtra por nivel administrativo, región y fecha.
+              </p>
+              <p className="mb-8 text-xs text-slate-600">
+                {todayES()}
               </p>
               <SearchBar value={searchText} onChange={handleSearchChange} />
             </div>

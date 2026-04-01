@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
   const fechaDesde = searchParams.get("fechaDesde") ?? "";
   const fechaHasta = searchParams.get("fechaHasta") ?? "";
   const soloAbiertas = searchParams.get("soloAbiertas") === "true";
+  const presupuestoRango = searchParams.get("presupuestoRango") ?? "";
   const page = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10));
   const pageSize = Math.min(
     100,
@@ -42,7 +43,19 @@ export async function GET(req: NextRequest) {
       params.push(fechaHasta);
     }
     if (soloAbiertas) {
-      conditions.push("abierto = 1");
+      // Abierta = tiene fecha de fin de solicitud y aún no ha pasado
+      conditions.push("fechaFinSolicitud IS NOT NULL AND fechaFinSolicitud >= date('now')");
+    }
+    if (presupuestoRango) {
+      if (presupuestoRango === "0-50000") {
+        conditions.push("presupuestoTotal > 0 AND presupuestoTotal <= 50000");
+      } else if (presupuestoRango === "50000-500000") {
+        conditions.push("presupuestoTotal > 50000 AND presupuestoTotal <= 500000");
+      } else if (presupuestoRango === "500000-5000000") {
+        conditions.push("presupuestoTotal > 500000 AND presupuestoTotal <= 5000000");
+      } else if (presupuestoRango === "5000000+") {
+        conditions.push("presupuestoTotal > 5000000");
+      }
     }
 
     let rows: DbConvocatoria[];

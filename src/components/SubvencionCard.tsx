@@ -51,10 +51,16 @@ export default function SubvencionCard({
   isFavorite,
   onToggleFavorite,
 }: SubvencionCardProps) {
-  const url         = buildBDNSUrl(subvencion.numeroConvocatoria);
+  const url = buildBDNSUrl(subvencion.numeroConvocatoria);
   const hasRealPlazo = !!subvencion.plazoFin;
-  const isOpen      = subvencion.abierto === true;
-  const isClosed    = subvencion.abierto === false;
+
+  // Open/closed is determined by fechaFinSolicitud vs today (date-based, not scraped flag)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadlineDate = subvencion.fechaFinSolicitud ? new Date(subvencion.fechaFinSolicitud) : null;
+  const isOpen   = deadlineDate !== null && deadlineDate >= today;
+  const isClosed = deadlineDate !== null && deadlineDate < today;
+  const sinPlazo = deadlineDate === null;
 
   return (
     <a
@@ -81,6 +87,11 @@ export default function SubvencionCard({
             {isClosed && (
               <span className="inline-flex items-center rounded-md border border-slate-600 bg-slate-800/60 px-2 py-0.5 text-xs text-slate-500">
                 Cerrada
+              </span>
+            )}
+            {sinPlazo && (
+              <span className="inline-flex items-center rounded-md border border-slate-700 bg-slate-800/40 px-2 py-0.5 text-xs text-slate-600">
+                Sin plazo
               </span>
             )}
             {subvencion.mrr && (

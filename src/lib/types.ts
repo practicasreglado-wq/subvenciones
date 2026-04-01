@@ -33,6 +33,9 @@ export interface SubvencionesResponse {
   numberOfElements: number;
 }
 
+// "" | "0-50000" | "50000-500000" | "500000-5000000" | "5000000+"
+export type PresupuestoRango = "" | "0-50000" | "50000-500000" | "500000-5000000" | "5000000+";
+
 export interface SearchFilters {
   busqueda: string;
   nivel1: NivelAdministrativo | "";
@@ -40,4 +43,5 @@ export interface SearchFilters {
   fechaDesde: string;
   fechaHasta: string;
   soloAbiertas: boolean;
+  presupuestoRango: PresupuestoRango;
 }
