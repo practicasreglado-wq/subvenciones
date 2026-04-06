@@ -16,33 +16,45 @@ interface RawRecord {
   nivel2: string;
   nivel3: string | null;
   codigoInvente: string | null;
-  rutaConvocatoria: string;
+  // plazo fields — present after build-ultimas.ts runs
+  plazoInicio?: string | null;
+  plazoFin?: string | null;
+  fechaFinSolicitud?: string | null;
+  textInicio?: string | null;
+  textFin?: string | null;
+  abierto?: boolean | null;
+  presupuestoTotal?: number | null;
+  tipoConvocatoria?: string | null;
 }
 
 const ALL = (rawData as RawRecord[]).map((r) => ({
   ...r,
-  // plazo fields not present in this dataset
-  plazoInicio: null,
-  plazoFin: null,
-  fechaFinSolicitud: null,
-  textFin: null,
-  abierto: null,
-  presupuestoTotal: null,
-  tipoConvocatoria: null,
+  plazoInicio:       r.plazoInicio       ?? null,
+  plazoFin:          r.plazoFin          ?? null,
+  fechaFinSolicitud: r.fechaFinSolicitud ?? null,
+  textInicio:        r.textInicio        ?? null,
+  textFin:           r.textFin           ?? null,
+  abierto:           r.abierto           ?? null,
+  presupuestoTotal:  r.presupuestoTotal  ?? null,
+  tipoConvocatoria:  r.tipoConvocatoria  ?? null,
 }));
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const busqueda = searchParams.get("busqueda")?.trim().toLowerCase() ?? "";
-  const nivel1   = searchParams.get("nivel1") ?? "";
-  const nivel2   = searchParams.get("nivel2") ?? "";
-  const fechaDesde = searchParams.get("fechaDesde") ?? "";
-  const fechaHasta = searchParams.get("fechaHasta") ?? "";
+  const busqueda        = searchParams.get("busqueda")?.trim().toLowerCase() ?? "";
+  const nivel1          = searchParams.get("nivel1") ?? "";
+  const nivel2          = searchParams.get("nivel2") ?? "";
+  const fechaDesde      = searchParams.get("fechaDesde") ?? "";
+  const fechaHasta      = searchParams.get("fechaHasta") ?? "";
+  const soloAbiertas    = searchParams.get("soloAbiertas") === "true";
+  const presupuestoRango = searchParams.get("presupuestoRango") ?? "";
   const page     = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10));
   const pageSize = Math.min(
     100,
     Math.max(1, parseInt(searchParams.get("pageSize") ?? String(PAGE_SIZE), 10))
   );
+
+  const today = new Date().toISOString().split("T")[0];
 
   let filtered = ALL;
 
@@ -59,6 +71,22 @@ export async function GET(req: NextRequest) {
   }
   if (fechaHasta) {
     filtered = filtered.filter((r) => r.fechaRecepcion <= fechaHasta);
+  }
+  if (soloAbiertas) {
+    filtered = filtered.filter(
+      (r) => r.fechaFinSolicitud != null && r.fechaFinSolicitud >= today
+    );
+  }
+  if (presupuestoRango) {
+    filtered = filtered.filter((r) => {
+      const p = r.presupuestoTotal;
+      if (p == null || p <= 0) return false;
+      if (presupuestoRango === "0-50000")         return p <= 50_000;
+      if (presupuestoRango === "50000-500000")    return p > 50_000   && p <= 500_000;
+      if (presupuestoRango === "500000-5000000")  return p > 500_000  && p <= 5_000_000;
+      if (presupuestoRango === "5000000+")        return p > 5_000_000;
+      return true;
+    });
   }
   if (busqueda) {
     const terms = busqueda.split(/\s+/).filter(Boolean);
