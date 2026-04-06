@@ -17,7 +17,7 @@ const EMPTY: SubvencionesResponse = {
   numberOfElements: 0,
 };
 
-export function useSubvenciones(filters: SearchFilters, page: number) {
+export function useSubvenciones(filters: SearchFilters, page: number, endpoint: string = "/api/subvenciones") {
   const [data, setData] = useState<SubvencionesResponse>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export function useSubvenciones(filters: SearchFilters, page: number) {
     setLoading(true);
     setError(null);
 
-    fetchSubvenciones(filters, page)
+    fetchSubvenciones(filters, page, PAGE_SIZE, endpoint)
       .then((res) => {
         setData(res);
         setLoading(false);

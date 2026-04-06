@@ -10,6 +10,7 @@ export const NIVELES: { label: string; value: NivelAdministrativo | "" }[] = [
   { label: "Estatal", value: "ESTADO" },
   { label: "Autonómica", value: "AUTONOMICA" },
   { label: "Local", value: "LOCAL" },
+  { label: "Otros", value: "OTROS" },
 ];
 
 export const COMUNIDADES_AUTONOMAS = [

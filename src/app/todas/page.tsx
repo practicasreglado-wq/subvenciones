@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Sparkles, AlertCircle, Clock } from "lucide-react";
+import { Sparkles, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
@@ -31,7 +31,7 @@ function todayES(): string {
   });
 }
 
-export default function HomePage() {
+export default function TodasPage() {
   const [searchText, setSearchText] = useState("");
   const [filters, setFilters] = useState<SearchFilters>(defaultFilters);
   const [page, setPage] = useState(0);
@@ -44,7 +44,7 @@ export default function HomePage() {
     [filters, debouncedSearch]
   );
 
-  const { data, loading, error } = useSubvenciones(activeFilters, page, "/api/recientes");
+  const { data, loading, error } = useSubvenciones(activeFilters, page, "/api/subvenciones");
 
   const handleFilterChange = (newFilters: SearchFilters) => {
     setFilters(newFilters);
@@ -66,16 +66,16 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="mx-auto max-w-2xl text-center">
               <div className="mb-4 flex items-center justify-center gap-2">
-                <Clock className="h-5 w-5 text-emerald-400" />
+                <Sparkles className="h-6 w-6 text-emerald-400" />
                 <span className="text-sm font-medium text-emerald-400">
-                  Últimas convocatorias publicadas
+                  Base de Datos Nacional de Subvenciones
                 </span>
               </div>
               <h1 className="mb-3 text-3xl font-bold text-white sm:text-4xl">
-                Últimas subvenciones
+                Todas las subvenciones
               </h1>
               <p className="mb-1 text-slate-400">
-                Las 100 convocatorias más recientes del BDNS.
+                Busca entre todas las convocatorias del gobierno de España.
                 Filtra por nivel administrativo, región y fecha.
               </p>
               <p className="mb-8 text-xs text-slate-600">
@@ -88,7 +88,6 @@ export default function HomePage() {
 
         {/* Results */}
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          {/* Error banner */}
           {error && (
             <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
               <AlertCircle className="h-4 w-4 shrink-0" />

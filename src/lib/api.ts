@@ -4,7 +4,8 @@ import { PAGE_SIZE } from "./constants";
 export async function fetchSubvenciones(
   filters: SearchFilters,
   page: number = 0,
-  pageSize: number = PAGE_SIZE
+  pageSize: number = PAGE_SIZE,
+  endpoint: string = "/api/subvenciones"
 ): Promise<SubvencionesResponse> {
   const params = new URLSearchParams();
   params.set("page", String(page));
@@ -17,7 +18,7 @@ export async function fetchSubvenciones(
   if (filters.soloAbiertas) params.set("soloAbiertas", "true");
   if (filters.presupuestoRango) params.set("presupuestoRango", filters.presupuestoRango);
 
-  const res = await fetch(`/api/subvenciones?${params}`);
+  const res = await fetch(`${endpoint}?${params}`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
 }

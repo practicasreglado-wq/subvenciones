@@ -19,7 +19,7 @@ export interface Subvencion {
   tipoConvocatoria: string | null;
 }
 
-export type NivelAdministrativo = "ESTADO" | "AUTONOMICA" | "LOCAL";
+export type NivelAdministrativo = "ESTADO" | "AUTONOMICA" | "LOCAL" | "OTROS";
 
 export interface SubvencionesResponse {
   content: Subvencion[];

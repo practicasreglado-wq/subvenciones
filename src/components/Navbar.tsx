@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Star, Sparkles } from "lucide-react";
+import { Search, Star, Sparkles, Clock } from "lucide-react";
 
 interface NavbarProps {
   favoritesCount: number;
@@ -30,8 +30,20 @@ export default function Navbar({ favoritesCount }: NavbarProps) {
                 : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
             }`}
           >
+            <Clock className="h-4 w-4" />
+            <span className="hidden sm:inline">Últimas</span>
+          </Link>
+
+          <Link
+            href="/todas"
+            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${
+              pathname === "/todas"
+                ? "bg-slate-800 text-white"
+                : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+            }`}
+          >
             <Search className="h-4 w-4" />
-            <span className="hidden sm:inline">Buscar</span>
+            <span className="hidden sm:inline">Todas</span>
           </Link>
 
           <Link
