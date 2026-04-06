@@ -9,6 +9,7 @@ interface SubvencionListProps {
   isFavorite: (id: number) => boolean;
   onToggleFavorite: (id: number) => void;
   loading?: boolean;
+  onGenerarEmail?: (s: Subvencion) => void;
 }
 
 export default function SubvencionList({
@@ -16,6 +17,7 @@ export default function SubvencionList({
   isFavorite,
   onToggleFavorite,
   loading,
+  onGenerarEmail,
 }: SubvencionListProps) {
   if (loading) {
     return (
@@ -59,6 +61,7 @@ export default function SubvencionList({
           subvencion={sub}
           isFavorite={isFavorite(sub.id)}
           onToggleFavorite={() => onToggleFavorite(sub.id)}
+          onGenerarEmail={onGenerarEmail}
         />
       ))}
     </div>

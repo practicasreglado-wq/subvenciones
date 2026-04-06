@@ -12,9 +12,11 @@
     "scrape:plazos": "tsx scripts/scraper-plazos.ts",
     "scrape:plazos:force": "tsx scripts/scraper-plazos.ts --force",
     "build:ultimas": "tsx scripts/build-ultimas.ts",
-    "build:ultimas:force": "tsx scripts/build-ultimas.ts --force"
+    "build:ultimas:force": "tsx scripts/build-ultimas.ts --force",
+    "scrape:diario": "tsx scripts/scrape-diario.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "better-sqlite3": "^12.8.0",
     "lucide-react": "^1.7.0",
     "next": "14.2.35",

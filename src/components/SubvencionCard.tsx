@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Calendar, Building2, Zap, Clock, Euro } from "lucide-react";
+import { ExternalLink, Calendar, Building2, Zap, Clock, Euro, Mail } from "lucide-react";
 import { Subvencion } from "@/lib/types";
 import {
   toTitleCase,
@@ -19,6 +19,7 @@ interface SubvencionCardProps {
   subvencion: Subvencion;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  onGenerarEmail?: (s: Subvencion) => void;
 }
 
 /** Format plazo: ISO date → Spanish locale, or raw text truncated */
@@ -53,6 +54,7 @@ export default function SubvencionCard({
   subvencion,
   isFavorite,
   onToggleFavorite,
+  onGenerarEmail,
 }: SubvencionCardProps) {
   const url = buildBDNSUrl(subvencion.numeroConvocatoria);
   const hasRealPlazo  = !!subvencion.plazoFin;
@@ -184,6 +186,19 @@ export default function SubvencionCard({
         {/* ── Actions ── */}
         <div className="flex shrink-0 flex-col items-center gap-1">
           <FavoriteStar active={isFavorite} onClick={onToggleFavorite} />
+          {onGenerarEmail && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onGenerarEmail(subvencion);
+              }}
+              title="Generar email comercial"
+              className="rounded p-0.5 text-slate-600 hover:text-indigo-400 transition-colors"
+            >
+              <Mail className="h-4 w-4" />
+            </button>
+          )}
           <ExternalLink className="h-4 w-4 text-slate-700 group-hover:text-slate-500" />
         </div>
       </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SubvencionList from "@/components/SubvencionList";
+import EmailModal from "@/components/EmailModal";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Subvencion } from "@/lib/types";
 
@@ -13,6 +14,7 @@ export default function FavoritosPage() {
   const { favorites, isFavorite, toggleFavorite, loaded } = useFavorites();
   const [favoriteItems, setFavoriteItems] = useState<Subvencion[]>([]);
   const [fetching, setFetching] = useState(false);
+  const [emailSub, setEmailSub] = useState<Subvencion | null>(null);
 
   useEffect(() => {
     if (!loaded || favorites.length === 0) {
@@ -87,12 +89,20 @@ export default function FavoritosPage() {
               subvenciones={favoriteItems}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
+              onGenerarEmail={setEmailSub}
             />
           )}
         </div>
       </main>
 
       <Footer />
+
+      {emailSub && (
+        <EmailModal
+          subvencion={emailSub}
+          onClose={() => setEmailSub(null)}
+        />
+      )}
     </>
   );
 }
