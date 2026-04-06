@@ -21,6 +21,9 @@ const defaultFilters: SearchFilters = {
   fechaHasta: "",
   soloAbiertas: false,
   presupuestoRango: "",
+  tipoConv: "",
+  soloPerte: false,
+  soloEuropeos: false,
 };
 
 function todayES(): string {
@@ -75,8 +78,9 @@ export default function TodasPage() {
                 Todas las subvenciones
               </h1>
               <p className="mb-1 text-slate-400">
-                Busca entre todas las convocatorias del gobierno de España.
-                Filtra por nivel administrativo, región y fecha.
+                Base completa del BDNS — analiza, clasifica y filtra toda
+                la base histórica de fondos públicos en España.
+                Europeos, estatales, autonómicos, provinciales y PERTE.
               </p>
               <p className="mb-8 text-xs text-slate-600">
                 {todayES()}

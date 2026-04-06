@@ -46,8 +46,11 @@ export async function GET(req: NextRequest) {
   const nivel2          = searchParams.get("nivel2") ?? "";
   const fechaDesde      = searchParams.get("fechaDesde") ?? "";
   const fechaHasta      = searchParams.get("fechaHasta") ?? "";
-  const soloAbiertas    = searchParams.get("soloAbiertas") === "true";
+  const soloAbiertas     = searchParams.get("soloAbiertas") === "true";
   const presupuestoRango = searchParams.get("presupuestoRango") ?? "";
+  const tipoConv         = searchParams.get("tipoConv") ?? "";
+  const soloPerte        = searchParams.get("soloPerte") === "true";
+  const soloEuropeos     = searchParams.get("soloEuropeos") === "true";
   const page     = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10));
   const pageSize = Math.min(
     100,
@@ -86,6 +89,21 @@ export async function GET(req: NextRequest) {
       if (presupuestoRango === "500000-5000000")  return p > 500_000  && p <= 5_000_000;
       if (presupuestoRango === "5000000+")        return p > 5_000_000;
       return true;
+    });
+  }
+  if (tipoConv) {
+    filtered = filtered.filter((r) =>
+      r.tipoConvocatoria?.toLowerCase().includes(tipoConv) ?? false
+    );
+  }
+  if (soloPerte) {
+    filtered = filtered.filter((r) => r.descripcion.toUpperCase().includes("PERTE"));
+  }
+  if (soloEuropeos) {
+    const EU = ["FEDER", "FSE", "FEADER", "FEAGA", "INTERREG", "NEXT GENERATION", "HORIZONTE EUROPA", "REACT-EU"];
+    filtered = filtered.filter((r) => {
+      const up = r.descripcion.toUpperCase();
+      return EU.some((kw) => up.includes(kw));
     });
   }
   if (busqueda) {

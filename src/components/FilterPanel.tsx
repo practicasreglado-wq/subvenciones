@@ -3,7 +3,7 @@
 import { SlidersHorizontal, X, Zap } from "lucide-react";
 import { useState } from "react";
 import { NIVELES, COMUNIDADES_AUTONOMAS } from "@/lib/constants";
-import { SearchFilters, PresupuestoRango } from "@/lib/types";
+import { SearchFilters, PresupuestoRango, TipoConv } from "@/lib/types";
 
 interface FilterPanelProps {
   filters: SearchFilters;
@@ -49,12 +49,18 @@ function detectPreset(fechaDesde: string, fechaHasta: string): DatePreset {
 export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
   const [open, setOpen] = useState(false);
 
-  const hasFilters = !!(filters.nivel1 || filters.nivel2 || filters.fechaDesde || filters.fechaHasta || filters.soloAbiertas || filters.presupuestoRango);
+  const hasFilters = !!(filters.nivel1 || filters.nivel2 || filters.fechaDesde || filters.fechaHasta || filters.soloAbiertas || filters.presupuestoRango || filters.tipoConv || filters.soloPerte || filters.soloEuropeos);
   const activePreset = detectPreset(filters.fechaDesde, filters.fechaHasta);
 
   const clearFilters = () => {
-    onChange({ ...filters, nivel1: "", nivel2: "", fechaDesde: "", fechaHasta: "", soloAbiertas: false, presupuestoRango: "" });
+    onChange({ ...filters, nivel1: "", nivel2: "", fechaDesde: "", fechaHasta: "", soloAbiertas: false, presupuestoRango: "", tipoConv: "", soloPerte: false, soloEuropeos: false });
   };
+
+  const TIPO_CONV_OPCIONES: { label: string; value: TipoConv }[] = [
+    { label: "Todos los tipos",   value: "" },
+    { label: "Competitiva",       value: "competitiva" },
+    { label: "Concesión directa", value: "directa" },
+  ];
 
   const PRESUPUESTO_OPCIONES: { label: string; value: PresupuestoRango }[] = [
     { label: "Cualquier importe", value: "" },
@@ -96,7 +102,7 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
           Filtros
           {hasFilters && (
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
-              {[filters.nivel1, filters.nivel2, filters.fechaDesde || filters.fechaHasta, filters.soloAbiertas, filters.presupuestoRango].filter(Boolean).length}
+              {[filters.nivel1, filters.nivel2, filters.fechaDesde || filters.fechaHasta, filters.soloAbiertas, filters.presupuestoRango, filters.tipoConv, filters.soloPerte, filters.soloEuropeos].filter(Boolean).length}
             </span>
           )}
         </button>
@@ -130,6 +136,31 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
           Solo abiertas
         </button>
 
+        {/* PERTE */}
+        <button
+          onClick={() => onChange({ ...filters, soloPerte: !filters.soloPerte })}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
+            filters.soloPerte
+              ? "border-yellow-500/50 bg-yellow-500/10 text-yellow-400"
+              : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-white"
+          }`}
+        >
+          <Zap className="h-3.5 w-3.5" />
+          PERTE
+        </button>
+
+        {/* Fondos europeos */}
+        <button
+          onClick={() => onChange({ ...filters, soloEuropeos: !filters.soloEuropeos })}
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-all ${
+            filters.soloEuropeos
+              ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-400"
+              : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-white"
+          }`}
+        >
+          ★ EU
+        </button>
+
         {/* Clear */}
         {hasFilters && (
           <button
@@ -143,7 +174,7 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
       </div>
 
       {open && (
-        <div className="mt-3 grid gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-3 grid gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
               Nivel administrativo
@@ -216,6 +247,27 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
               }`}
             >
               {PRESUPUESTO_OPCIONES.map((o) => (
+                <option key={o.value} value={o.value} className="bg-slate-800 text-white">
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-400">
+              Tipo convocatoria
+            </label>
+            <select
+              value={filters.tipoConv}
+              onChange={(e) => onChange({ ...filters, tipoConv: e.target.value as TipoConv })}
+              className={`w-full rounded-lg border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none ${
+                filters.tipoConv
+                  ? "border-sky-500/50 bg-sky-500/10 text-sky-400"
+                  : "border-slate-700 bg-slate-800 text-white"
+              }`}
+            >
+              {TIPO_CONV_OPCIONES.map((o) => (
                 <option key={o.value} value={o.value} className="bg-slate-800 text-white">
                   {o.label}
                 </option>

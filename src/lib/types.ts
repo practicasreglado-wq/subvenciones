@@ -36,6 +36,8 @@ export interface SubvencionesResponse {
 // "" | "0-50000" | "50000-500000" | "500000-5000000" | "5000000+"
 export type PresupuestoRango = "" | "0-50000" | "50000-500000" | "500000-5000000" | "5000000+";
 
+export type TipoConv = "" | "competitiva" | "directa";
+
 export interface SearchFilters {
   busqueda: string;
   nivel1: NivelAdministrativo | "";
@@ -44,4 +46,7 @@ export interface SearchFilters {
   fechaHasta: string;
   soloAbiertas: boolean;
   presupuestoRango: PresupuestoRango;
+  tipoConv: TipoConv;
+  soloPerte: boolean;
+  soloEuropeos: boolean;
 }

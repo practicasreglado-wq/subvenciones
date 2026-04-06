@@ -12,8 +12,11 @@ export async function GET(req: NextRequest) {
   const nivel2 = searchParams.get("nivel2") ?? "";
   const fechaDesde = searchParams.get("fechaDesde") ?? "";
   const fechaHasta = searchParams.get("fechaHasta") ?? "";
-  const soloAbiertas = searchParams.get("soloAbiertas") === "true";
+  const soloAbiertas     = searchParams.get("soloAbiertas") === "true";
   const presupuestoRango = searchParams.get("presupuestoRango") ?? "";
+  const tipoConv         = searchParams.get("tipoConv") ?? "";
+  const soloPerte        = searchParams.get("soloPerte") === "true";
+  const soloEuropeos     = searchParams.get("soloEuropeos") === "true";
   const page = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10));
   const pageSize = Math.min(
     100,
@@ -47,15 +50,21 @@ export async function GET(req: NextRequest) {
       conditions.push("fechaFinSolicitud IS NOT NULL AND fechaFinSolicitud >= date('now')");
     }
     if (presupuestoRango) {
-      if (presupuestoRango === "0-50000") {
-        conditions.push("presupuestoTotal > 0 AND presupuestoTotal <= 50000");
-      } else if (presupuestoRango === "50000-500000") {
-        conditions.push("presupuestoTotal > 50000 AND presupuestoTotal <= 500000");
-      } else if (presupuestoRango === "500000-5000000") {
-        conditions.push("presupuestoTotal > 500000 AND presupuestoTotal <= 5000000");
-      } else if (presupuestoRango === "5000000+") {
-        conditions.push("presupuestoTotal > 5000000");
-      }
+      if (presupuestoRango === "0-50000")        conditions.push("presupuestoTotal > 0 AND presupuestoTotal <= 50000");
+      else if (presupuestoRango === "50000-500000")   conditions.push("presupuestoTotal > 50000 AND presupuestoTotal <= 500000");
+      else if (presupuestoRango === "500000-5000000") conditions.push("presupuestoTotal > 500000 AND presupuestoTotal <= 5000000");
+      else if (presupuestoRango === "5000000+")       conditions.push("presupuestoTotal > 5000000");
+    }
+    if (tipoConv === "competitiva") {
+      conditions.push("tipoConvocatoria LIKE '%competitiva%'");
+    } else if (tipoConv === "directa") {
+      conditions.push("tipoConvocatoria LIKE '%directa%'");
+    }
+    if (soloPerte) {
+      conditions.push("descripcion LIKE '%PERTE%'");
+    }
+    if (soloEuropeos) {
+      conditions.push("(descripcion LIKE '%FEDER%' OR descripcion LIKE '%FSE%' OR descripcion LIKE '%FEADER%' OR descripcion LIKE '%Next Generation%' OR descripcion LIKE '%Horizonte Europa%' OR descripcion LIKE '%INTERREG%' OR descripcion LIKE '%REACT-EU%')");
     }
 
     let rows: DbConvocatoria[];

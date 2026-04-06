@@ -40,13 +40,28 @@ export function getNivelColor(nivel: NivelAdministrativo): string {
 
 export function getNivelLabel(nivel: NivelAdministrativo): string {
   switch (nivel) {
-    case "ESTADO":
-      return "Estatal";
-    case "AUTONOMICA":
-      return "Autonómica";
-    case "LOCAL":
-      return "Local";
-    default:
-      return nivel;
+    case "ESTADO":    return "Estatal";
+    case "AUTONOMICA": return "Autonómica";
+    case "LOCAL":     return "Local / Provincial";
+    case "OTROS":     return "Otros";
+    default:          return nivel;
   }
+}
+
+/** "Concurrencia competitiva…" → "Competitiva" | "Concesión directa…" → "Directa" */
+export function getTipoConvLabel(tipo: string | null): "Competitiva" | "Directa" | null {
+  if (!tipo) return null;
+  if (tipo.toLowerCase().includes("competitiva")) return "Competitiva";
+  if (tipo.toLowerCase().includes("directa"))     return "Directa";
+  return null;
+}
+
+const EU_KEYWORDS = ["FEDER", "FSE", "FEADER", "FEAGA", "INTERREG", "Next Generation", "Horizonte Europa", "REACT-EU"];
+export function isFondoEuropeo(descripcion: string): boolean {
+  const upper = descripcion.toUpperCase();
+  return EU_KEYWORDS.some((kw) => upper.includes(kw.toUpperCase()));
+}
+
+export function isPERTE(descripcion: string): boolean {
+  return descripcion.toUpperCase().includes("PERTE");
 }

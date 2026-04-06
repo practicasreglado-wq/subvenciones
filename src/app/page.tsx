@@ -21,6 +21,9 @@ const defaultFilters: SearchFilters = {
   fechaHasta: "",
   soloAbiertas: false,
   presupuestoRango: "",
+  tipoConv: "",
+  soloPerte: false,
+  soloEuropeos: false,
 };
 
 function todayES(): string {
@@ -75,8 +78,8 @@ export default function HomePage() {
                 Últimas subvenciones
               </h1>
               <p className="mb-1 text-slate-400">
-                Las 100 convocatorias más recientes del BDNS.
-                Filtra por nivel administrativo, región y fecha.
+                Las convocatorias más recientes del BDNS — detecta y clasifica
+                oportunidades de financiación para tu cartera de clientes.
               </p>
               <p className="mb-8 text-xs text-slate-600">
                 {todayES()}

@@ -8,6 +8,9 @@ import {
   buildBDNSUrl,
   getNivelColor,
   getNivelLabel,
+  getTipoConvLabel,
+  isFondoEuropeo,
+  isPERTE,
   truncateText,
 } from "@/lib/utils";
 import FavoriteStar from "./FavoriteStar";
@@ -52,7 +55,10 @@ export default function SubvencionCard({
   onToggleFavorite,
 }: SubvencionCardProps) {
   const url = buildBDNSUrl(subvencion.numeroConvocatoria);
-  const hasRealPlazo = !!subvencion.plazoFin;
+  const hasRealPlazo  = !!subvencion.plazoFin;
+  const tipoConvLabel = getTipoConvLabel(subvencion.tipoConvocatoria);
+  const esEuropeo     = isFondoEuropeo(subvencion.descripcion);
+  const esPERTE       = isPERTE(subvencion.descripcion);
 
   // Open/closed is determined by fechaFinSolicitud vs today (date-based, not scraped flag)
   const today = new Date();
@@ -92,6 +98,26 @@ export default function SubvencionCard({
             {sinPlazo && (
               <span className="inline-flex items-center rounded-md border border-slate-700 bg-slate-800/40 px-2 py-0.5 text-xs text-slate-600">
                 Sin plazo
+              </span>
+            )}
+            {esPERTE && (
+              <span className="inline-flex items-center gap-1 rounded-md border border-yellow-500/40 bg-yellow-500/15 px-2 py-0.5 text-xs font-medium text-yellow-400">
+                <Zap className="h-3 w-3" />
+                PERTE
+              </span>
+            )}
+            {esEuropeo && (
+              <span className="inline-flex items-center gap-1 rounded-md border border-indigo-500/40 bg-indigo-500/15 px-2 py-0.5 text-xs font-medium text-indigo-400">
+                ★ EU
+              </span>
+            )}
+            {tipoConvLabel && (
+              <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${
+                tipoConvLabel === "Competitiva"
+                  ? "border-sky-500/30 bg-sky-500/15 text-sky-400"
+                  : "border-slate-600 bg-slate-800/60 text-slate-500"
+              }`}>
+                {tipoConvLabel}
               </span>
             )}
             {subvencion.mrr && (

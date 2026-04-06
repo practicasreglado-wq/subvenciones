@@ -1,4 +1,4 @@
-import { SearchFilters, SubvencionesResponse, PresupuestoRango } from "./types";
+import { SearchFilters, SubvencionesResponse } from "./types";
 import { PAGE_SIZE } from "./constants";
 
 export async function fetchSubvenciones(
@@ -17,6 +17,9 @@ export async function fetchSubvenciones(
   if (filters.fechaHasta) params.set("fechaHasta", filters.fechaHasta);
   if (filters.soloAbiertas) params.set("soloAbiertas", "true");
   if (filters.presupuestoRango) params.set("presupuestoRango", filters.presupuestoRango);
+  if (filters.tipoConv) params.set("tipoConv", filters.tipoConv);
+  if (filters.soloPerte) params.set("soloPerte", "true");
+  if (filters.soloEuropeos) params.set("soloEuropeos", "true");
 
   const res = await fetch(`${endpoint}?${params}`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
