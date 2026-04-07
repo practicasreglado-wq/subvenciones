@@ -2,8 +2,9 @@
 
 import { SlidersHorizontal, X, Zap } from "lucide-react";
 import { useState } from "react";
-import { NIVELES, COMUNIDADES_AUTONOMAS } from "@/lib/constants";
+import { NIVELES, CCAA_OPCIONES, PROVINCIAS_OPCIONES } from "@/lib/constants";
 import { SearchFilters, PresupuestoRango, TipoConv } from "@/lib/types";
+import MultiSelectFilter from "./MultiSelectFilter";
 
 interface FilterPanelProps {
   filters: SearchFilters;
@@ -21,7 +22,7 @@ function getPresetDates(preset: DatePreset): { fechaDesde: string; fechaHasta: s
     return { fechaDesde: s, fechaHasta: s };
   }
   if (preset === "semana") {
-    const day = today.getDay(); // 0=Sun
+    const day = today.getDay();
     const diffToMon = (day === 0 ? -6 : 1 - day);
     const mon = new Date(today);
     mon.setDate(today.getDate() + diffToMon);
@@ -46,14 +47,40 @@ function detectPreset(fechaDesde: string, fechaHasta: string): DatePreset {
   return "";
 }
 
+const CCAA_OPTIONS = CCAA_OPCIONES.map((c) => ({ label: c.label, value: c.dbValue }));
+const PROV_OPTIONS = PROVINCIAS_OPCIONES.map((p) => ({ label: p.label, value: p.keyword }));
+
 export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
   const [open, setOpen] = useState(false);
 
-  const hasFilters = !!(filters.nivel1 || filters.nivel2 || filters.fechaDesde || filters.fechaHasta || filters.soloAbiertas || filters.presupuestoRango || filters.tipoConv || filters.soloPerte || filters.soloEuropeos);
+  const hasFilters = !!(
+    filters.nivel1 ||
+    filters.ccaa.length ||
+    filters.provincias.length ||
+    filters.fechaDesde ||
+    filters.fechaHasta ||
+    filters.soloAbiertas ||
+    filters.presupuestoRango ||
+    filters.tipoConv ||
+    filters.soloPerte ||
+    filters.soloEuropeos
+  );
   const activePreset = detectPreset(filters.fechaDesde, filters.fechaHasta);
 
   const clearFilters = () => {
-    onChange({ ...filters, nivel1: "", nivel2: "", fechaDesde: "", fechaHasta: "", soloAbiertas: false, presupuestoRango: "", tipoConv: "", soloPerte: false, soloEuropeos: false });
+    onChange({
+      ...filters,
+      nivel1: "",
+      ccaa: [],
+      provincias: [],
+      fechaDesde: "",
+      fechaHasta: "",
+      soloAbiertas: false,
+      presupuestoRango: "",
+      tipoConv: "",
+      soloPerte: false,
+      soloEuropeos: false,
+    });
   };
 
   const TIPO_CONV_OPCIONES: { label: string; value: TipoConv }[] = [
@@ -72,7 +99,6 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
   const applyPreset = (preset: DatePreset) => {
     if (preset === activePreset) {
-      // toggle off
       onChange({ ...filters, fechaDesde: "", fechaHasta: "" });
     } else {
       const dates = getPresetDates(preset);
@@ -85,6 +111,19 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
     { label: "Esta semana", value: "semana" },
     { label: "Este mes", value: "mes" },
   ];
+
+  // Active filter count for badge
+  const filterCount = [
+    filters.nivel1,
+    filters.ccaa.length ? "x" : "",
+    filters.provincias.length ? "x" : "",
+    filters.fechaDesde || filters.fechaHasta ? "x" : "",
+    filters.soloAbiertas ? "x" : "",
+    filters.presupuestoRango,
+    filters.tipoConv,
+    filters.soloPerte ? "x" : "",
+    filters.soloEuropeos ? "x" : "",
+  ].filter(Boolean).length;
 
   return (
     <div>
@@ -102,7 +141,7 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
           Filtros
           {hasFilters && (
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
-              {[filters.nivel1, filters.nivel2, filters.fechaDesde || filters.fechaHasta, filters.soloAbiertas, filters.presupuestoRango, filters.tipoConv, filters.soloPerte, filters.soloEuropeos].filter(Boolean).length}
+              {filterCount}
             </span>
           )}
         </button>
@@ -175,6 +214,8 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       {open && (
         <div className="mt-3 grid gap-3 rounded-xl border border-slate-800 bg-slate-900/50 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+
+          {/* Nivel administrativo */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
               Nivel administrativo
@@ -192,23 +233,25 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
             </select>
           </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">
-              Comunidad / Región
-            </label>
-            <select
-              value={filters.nivel2}
-              onChange={(e) => onChange({ ...filters, nivel2: e.target.value })}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
-            >
-              {COMUNIDADES_AUTONOMAS.map((r) => (
-                <option key={r} value={r === "Todas las regiones" ? "" : r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* CCAA multi-select */}
+          <MultiSelectFilter
+            label="Comunidad Autónoma"
+            options={CCAA_OPTIONS}
+            selected={filters.ccaa}
+            onChange={(ccaa) => onChange({ ...filters, ccaa })}
+            placeholder="Buscar CCAA…"
+          />
 
+          {/* Provincias multi-select */}
+          <MultiSelectFilter
+            label="Provincia"
+            options={PROV_OPTIONS}
+            selected={filters.provincias}
+            onChange={(provincias) => onChange({ ...filters, provincias })}
+            placeholder="Buscar provincia…"
+          />
+
+          {/* Fecha desde */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
               Fecha conv. desde
@@ -221,6 +264,7 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
             />
           </div>
 
+          {/* Fecha hasta */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
               Fecha conv. hasta
@@ -233,6 +277,7 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
             />
           </div>
 
+          {/* Presupuesto */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
               Presupuesto
@@ -254,6 +299,7 @@ export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
             </select>
           </div>
 
+          {/* Tipo convocatoria — spans the row on larger screens */}
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">
               Tipo convocatoria

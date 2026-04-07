@@ -41,7 +41,8 @@ export type TipoConv = "" | "competitiva" | "directa";
 export interface SearchFilters {
   busqueda: string;
   nivel1: NivelAdministrativo | "";
-  nivel2: string;
+  ccaa: string[];         // nivel2 exact match for AUTONOMICA records
+  provincias: string[];   // nivel2 keyword match for LOCAL records
   fechaDesde: string;
   fechaHasta: string;
   soloAbiertas: boolean;

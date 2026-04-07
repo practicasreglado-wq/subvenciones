@@ -16,7 +16,6 @@ interface RawRecord {
   nivel2: string;
   nivel3: string | null;
   codigoInvente: string | null;
-  // plazo fields — present after build-ultimas.ts runs
   plazoInicio?: string | null;
   plazoFin?: string | null;
   fechaFinSolicitud?: string | null;
@@ -43,14 +42,15 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const busqueda        = searchParams.get("busqueda")?.trim().toLowerCase() ?? "";
   const nivel1          = searchParams.get("nivel1") ?? "";
-  const nivel2          = searchParams.get("nivel2") ?? "";
+  const ccaa            = searchParams.getAll("ccaa").filter(Boolean);
+  const provincias      = searchParams.getAll("provincias").filter(Boolean);
   const fechaDesde      = searchParams.get("fechaDesde") ?? "";
   const fechaHasta      = searchParams.get("fechaHasta") ?? "";
-  const soloAbiertas     = searchParams.get("soloAbiertas") === "true";
+  const soloAbiertas    = searchParams.get("soloAbiertas") === "true";
   const presupuestoRango = searchParams.get("presupuestoRango") ?? "";
-  const tipoConv         = searchParams.get("tipoConv") ?? "";
-  const soloPerte        = searchParams.get("soloPerte") === "true";
-  const soloEuropeos     = searchParams.get("soloEuropeos") === "true";
+  const tipoConv        = searchParams.get("tipoConv") ?? "";
+  const soloPerte       = searchParams.get("soloPerte") === "true";
+  const soloEuropeos    = searchParams.get("soloEuropeos") === "true";
   const page     = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10));
   const pageSize = Math.min(
     100,
@@ -64,10 +64,14 @@ export async function GET(req: NextRequest) {
   if (nivel1) {
     filtered = filtered.filter((r) => r.nivel1 === nivel1);
   }
-  if (nivel2) {
-    filtered = filtered.filter((r) =>
-      r.nivel2.toLowerCase().includes(nivel2.toLowerCase())
-    );
+  if (ccaa.length > 0) {
+    filtered = filtered.filter((r) => ccaa.includes(r.nivel2.toUpperCase()));
+  }
+  if (provincias.length > 0) {
+    filtered = filtered.filter((r) => {
+      const n2 = r.nivel2.toUpperCase();
+      return provincias.some((kw) => n2.includes(kw.toUpperCase()));
+    });
   }
   if (fechaDesde) {
     filtered = filtered.filter((r) => r.fechaRecepcion >= fechaDesde);

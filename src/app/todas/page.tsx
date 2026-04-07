@@ -16,7 +16,8 @@ import { SearchFilters } from "@/lib/types";
 const defaultFilters: SearchFilters = {
   busqueda: "",
   nivel1: "",
-  nivel2: "",
+  ccaa: [],
+  provincias: [],
   fechaDesde: "",
   fechaHasta: "",
   soloAbiertas: false,
