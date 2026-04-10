@@ -10,16 +10,17 @@ export async function fetchSubvenciones(
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("pageSize", String(pageSize));
-  if (filters.busqueda) params.set("busqueda", filters.busqueda);
-  if (filters.nivel1)   params.set("nivel1",   filters.nivel1);
-  if (filters.nivel2)   params.set("nivel2",   filters.nivel2);
-  if (filters.fechaDesde) params.set("fechaDesde", filters.fechaDesde);
-  if (filters.fechaHasta) params.set("fechaHasta", filters.fechaHasta);
-  if (filters.soloAbiertas) params.set("soloAbiertas", "true");
+  if (filters.busqueda)      params.set("busqueda", filters.busqueda);
+  if (filters.nivel1)        params.set("nivel1", filters.nivel1);
+  filters.ccaa.forEach((v)  => params.append("ccaa", v));
+  filters.provincias.forEach((v) => params.append("provincias", v));
+  if (filters.fechaDesde)    params.set("fechaDesde", filters.fechaDesde);
+  if (filters.fechaHasta)    params.set("fechaHasta", filters.fechaHasta);
+  if (filters.soloAbiertas)  params.set("soloAbiertas", "true");
   if (filters.presupuestoRango) params.set("presupuestoRango", filters.presupuestoRango);
-  if (filters.tipoConv) params.set("tipoConv", filters.tipoConv);
-  if (filters.soloPerte) params.set("soloPerte", "true");
-  if (filters.soloEuropeos) params.set("soloEuropeos", "true");
+  if (filters.tipoConv)      params.set("tipoConv", filters.tipoConv);
+  if (filters.soloPerte)     params.set("soloPerte", "true");
+  if (filters.soloEuropeos)  params.set("soloEuropeos", "true");
 
   const res = await fetch(`${endpoint}?${params}`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);

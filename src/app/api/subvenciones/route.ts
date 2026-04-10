@@ -7,16 +7,17 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const busqueda = searchParams.get("busqueda")?.trim() ?? "";
-  const nivel1 = searchParams.get("nivel1") ?? "";
-  const nivel2 = searchParams.get("nivel2") ?? "";
-  const fechaDesde = searchParams.get("fechaDesde") ?? "";
-  const fechaHasta = searchParams.get("fechaHasta") ?? "";
-  const soloAbiertas     = searchParams.get("soloAbiertas") === "true";
+  const busqueda        = searchParams.get("busqueda")?.trim() ?? "";
+  const nivel1          = searchParams.get("nivel1") ?? "";
+  const ccaa            = searchParams.getAll("ccaa").filter(Boolean);
+  const provincias      = searchParams.getAll("provincias").filter(Boolean);
+  const fechaDesde      = searchParams.get("fechaDesde") ?? "";
+  const fechaHasta      = searchParams.get("fechaHasta") ?? "";
+  const soloAbiertas    = searchParams.get("soloAbiertas") === "true";
   const presupuestoRango = searchParams.get("presupuestoRango") ?? "";
-  const tipoConv         = searchParams.get("tipoConv") ?? "";
-  const soloPerte        = searchParams.get("soloPerte") === "true";
-  const soloEuropeos     = searchParams.get("soloEuropeos") === "true";
+  const tipoConv        = searchParams.get("tipoConv") ?? "";
+  const soloPerte       = searchParams.get("soloPerte") === "true";
+  const soloEuropeos    = searchParams.get("soloEuropeos") === "true";
   const page = Math.max(0, parseInt(searchParams.get("page") ?? "0", 10));
   const pageSize = Math.min(
     100,
@@ -33,10 +34,21 @@ export async function GET(req: NextRequest) {
       conditions.push("nivel1 = ?");
       params.push(nivel1);
     }
-    if (nivel2) {
-      conditions.push("nivel2 LIKE ?");
-      params.push(`%${nivel2}%`);
+
+    // CCAA: exact match against nivel2 (IN clause)
+    if (ccaa.length > 0) {
+      const ph = ccaa.map(() => "?").join(",");
+      conditions.push(`nivel2 IN (${ph})`);
+      params.push(...ccaa);
     }
+
+    // Provincias: LIKE keyword match against nivel2 (OR across selected)
+    if (provincias.length > 0) {
+      const provClauses = provincias.map(() => "nivel2 LIKE ?").join(" OR ");
+      conditions.push(`(${provClauses})`);
+      params.push(...provincias.map((kw) => `%${kw}%`));
+    }
+
     if (fechaDesde) {
       conditions.push("fechaRecepcion >= ?");
       params.push(fechaDesde);
@@ -46,7 +58,6 @@ export async function GET(req: NextRequest) {
       params.push(fechaHasta);
     }
     if (soloAbiertas) {
-      // Abierta = tiene fecha de fin de solicitud y aún no ha pasado
       conditions.push("fechaFinSolicitud IS NOT NULL AND fechaFinSolicitud >= date('now')");
     }
     if (presupuestoRango) {
@@ -71,7 +82,6 @@ export async function GET(req: NextRequest) {
     let totalElements: number;
 
     if (busqueda) {
-      // Use FTS for text search, join back to main table for filters
       const ftsQuery = busqueda
         .split(/\s+/)
         .filter(Boolean)
@@ -138,7 +148,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    // DB not found → serve from mock data fallback
     if (message.includes("not found")) {
       return NextResponse.json(
         { error: "Database not initialised. Run: npm run scrape" },
